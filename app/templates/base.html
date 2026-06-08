@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HabitAI — Build Better Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Bricolage Grotesque', 'sans-serif'],
+          body: ['DM Sans', 'sans-serif'],
+        },
+        colors: {
+          accent: '#5B4CF5',
+          'accent-light': '#EEF0FF',
+          'accent-mid': '#7C6AF7',
+          gold: '#F59E0B',
+          emerald: '#059669',
+          surface: '#FFFFFF',
+          'surface-2': '#F4F3FB',
+          'bg-main': '#F7F7F5',
+          'text-main': '#0F0E1A',
+          'text-sub': '#6B6B80',
+          'text-muted': '#9B9BAD',
+          border: '#E4E3F0',
+        }
+      }
+    }
+  }
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="font-body">
+
+<!-- Mesh background -->
+<div class="mesh-bg"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="brand-icon"><i class="ti ti-flame"></i></div>
+      <span class="brand-name">HabitAI</span>
+      <span class="brand-badge">Premium</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-user-pill">
+        <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
+        <span class="nav-username">{{ current_user.username }}</span>
+      </div>
+      <a href="/logout" class="nav-logout" title="Logout"><i class="ti ti-logout"></i></a>
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai.js') }}"></script>
+</body>
+</html>

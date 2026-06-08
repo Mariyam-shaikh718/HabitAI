@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-wrap">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Good <span id="greeting-time"></span> 👋</h1>
+      <p class="page-sub" id="today-date"></p>
+    </div>
+    <button class="btn-primary" onclick="openGoalModal()"><i class="ti ti-sparkles"></i> AI: Create habits</button>
+  </div>
+
+  <!-- Daily Intention Banner -->
+  <div class="intention-banner" id="daily-intention">
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Done today</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Due today</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-streak">0</div><div class="stat-lbl">Best streak</div></div>
+    <div class="stat-card mood-card">
+      <div class="mood-label">Today's mood</div>
+      <div class="mood-btns" id="mood-btns">
+        <button onclick="logMood(1)" title="Terrible">😞</button>
+        <button onclick="logMood(2)" title="Bad">😕</button>
+        <button onclick="logMood(3)" title="Okay">😐</button>
+        <button onclick="logMood(4)" title="Good">🙂</button>
+        <button onclick="logMood(5)" title="Great">😄</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-row">
+    <button class="tab active" onclick="switchTab('today','tab-today')"><i class="ti ti-check"></i> Today</button>
+    <button class="tab" onclick="switchTab('analytics','tab-analytics')"><i class="ti ti-chart-bar"></i> Analytics</button>
+    <button class="tab" onclick="switchTab('ai','tab-ai')"><i class="ti ti-robot"></i> AI Coach</button>
+    <button class="tab" onclick="switchTab('report','tab-report')"><i class="ti ti-report"></i> Report Card</button>
+  </div>
+
+  <!-- TODAY -->
+  <div class="tab-content active" id="tab-today">
+    <div class="habits-grid" id="habits-grid"></div>
+    <button class="add-habit-btn" onclick="openAddModal()"><i class="ti ti-plus"></i> Add habit manually</button>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="tab-content" id="tab-analytics">
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">7-day completion rate</div>
+        <canvas id="chart-week" height="180"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Mood trend (7 days)</div>
+        <canvas id="chart-mood" height="180"></canvas>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-top:1rem">
+      <div class="chart-title">Habit completion rate (30 days)</div>
+      <div id="habit-rates"></div>
+    </div>
+    <div class="chart-card" style="margin-top:1rem">
+      <div class="chart-title"><i class="ti ti-brain" style="color:#7c6af7"></i> AI mood-habit correlation</div>
+      <div id="mood-insight" class="ai-insight-box">
+        <button class="btn-ai-small" onclick="getMoodCorrelation()"><i class="ti ti-sparkles"></i> Analyze my patterns</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI COACH -->
+  <div class="tab-content" id="tab-ai">
+    <div class="ai-coach-card">
+      <div class="ai-header"><i class="ti ti-robot"></i><span>Your AI Coach</span></div>
+      <p class="ai-sub">Get personalized advice based on your actual habit data and mood patterns.</p>
+      <button class="btn-primary" onclick="getCoachAdvice()" id="coach-btn"><i class="ti ti-sparkles"></i> Get my personalized advice</button>
+      <div id="coach-response" class="ai-response"></div>
+    </div>
+  </div>
+
+  <!-- REPORT CARD -->
+  <div class="tab-content" id="tab-report">
+    <div class="ai-coach-card">
+      <div class="ai-header"><i class="ti ti-report"></i><span>Weekly Report Card</span></div>
+      <p class="ai-sub">AI grades each of your habits based on your performance this week.</p>
+      <button class="btn-primary" onclick="loadWeeklyReport()" id="report-btn"><i class="ti ti-sparkles"></i> Generate my report card</button>
+      <div id="report-container" style="margin-top:1.5rem"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add Habit Modal -->
+<div class="modal-overlay" id="add-modal" onclick="closeModal('add-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3>Add habit</h3><button class="modal-close" onclick="closeModal('add-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="field"><label>Habit name</label><input type="text" id="new-name" placeholder="e.g. Drink water"></div>
+    <div class="field"><label>Description (optional)</label><input type="text" id="new-desc" placeholder="Why this matters"></div>
+    <div class="field-row">
+      <div class="field"><label>Category</label>
+        <select id="new-cat">
+          <option value="health">Health</option><option value="fitness">Fitness</option>
+          <option value="mindfulness">Mindfulness</option><option value="learning">Learning</option>
+          <option value="productivity">Productivity</option><option value="social">Social</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Frequency</label>
+        <select id="new-freq">
+          <option value="daily">Daily</option><option value="weekdays">Weekdays</option>
+          <option value="weekends">Weekends</option><option value="3x">3× / week</option><option value="2x">2× / week</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Color</label><div class="color-picker" id="color-picker"></div></div>
+    <div class="field"><label>Icon</label><div class="icon-picker" id="icon-picker"></div></div>
+    <button class="btn-primary full-w" onclick="addHabit()"><i class="ti ti-plus"></i> Add habit</button>
+  </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="modal-overlay" id="goal-modal" onclick="closeModal('goal-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3><i class="ti ti-sparkles" style="color:#7c6af7"></i> AI Habit Creator</h3><button class="modal-close" onclick="closeModal('goal-modal')"><i class="ti ti-x"></i></button></div>
+    <p style="font-size:13px;color:#8888a0;margin-bottom:1rem">Describe your goal and AI will create a set of habits for you.</p>
+    <div class="field"><label>Your goal</label><input type="text" id="goal-input" placeholder="e.g. I want to lose weight and sleep better"></div>
+    <button class="btn-primary full-w" onclick="aiCreateHabits()" id="goal-btn"><i class="ti ti-sparkles"></i> Create my habit plan</button>
+    <div id="goal-result" style="margin-top:1rem"></div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal-overlay" id="note-modal" onclick="closeModal('note-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3 id="note-modal-title">Journal entry</h3><button class="modal-close" onclick="closeModal('note-modal')"><i class="ti ti-x"></i></button></div>
+    <div class="field"><textarea id="note-content" rows="4" placeholder="How did this habit go today? How are you feeling about it?"></textarea></div>
+    <button class="btn-primary full-w" onclick="submitNote()" id="note-btn"><i class="ti ti-send"></i> Save & get AI response</button>
+    <div id="note-ai-response" class="ai-response"></div>
+  </div>
+</div>
+
+<!-- Chat Widget -->
+<div id="chat-widget">
+  <button id="chat-toggle" onclick="toggleChat()" title="AI Chat Assistant">
+    <i class="ti ti-message-chatbot"></i>
+  </button>
+  <div id="chat-window">
+    <div id="chat-header">
+      <span><i class="ti ti-robot"></i> HabitAI Assistant</span>
+      <button onclick="toggleChat()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="chat-feed"></div>
+    <div id="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask your coach anything..." onkeydown="chatKeydown(event)">
+      <button onclick="sendChatMessage()"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
